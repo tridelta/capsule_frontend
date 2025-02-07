@@ -1,17 +1,17 @@
 <template>
   <var-paper :elevation="2">
-    <AtomDisplay title="Atom No.1" />
+    <AtomViewer title="Atom No.1" />
   </var-paper>
 </template>
 
 <script>
 // main app
-import AtomDisplay from './components/Atom.vue'
+import AtomViewer from './components/AtomViewer.vue';
 
 export default {
   name: 'App',
   components: {
-    AtomDisplay
+    AtomViewer
   }
 }
 </script>

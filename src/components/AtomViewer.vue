@@ -1,5 +1,7 @@
 <template>
     <div class="atom">
+
+
         <div class="atom-head">
             <!-- Title -->
             <h1>{{ thisAtom.title }}</h1>
@@ -18,57 +20,33 @@
 
         <div class="atom-contents">
             <h3>Contents</h3>
-
             <div class="quarks-container">
                 <draggable :list="thisAtom.contents" animation="200" itemKey="id" ghost-class="ghost"
-                    handle=".drag-handle" @end="onReorderQuark">
+                    handle=".drag-handle,.quark-icon" @end="onReorderQuark">
 
                     <!-- Quark element -->
                     <template #item="{ element }">
-                        <var-paper class="quark" :elevation="1">
-                            <div class="quark-icon">
-                                <var-avatar :round="false" size="small" :color="_qtypeStyle[element.type].color">
-                                    <var-icon :name="_qtypeStyle[element.type].icon" />
-                                </var-avatar>
-                            </div>
-
-                            <div class="quark-body">
-                                <div class="quark-content">
-                                    <p v-if="element.type == 'text'" class="markdown">{{ element.content }}</p>
-                                    <img v-if="element.type == 'image'" :src="element.content" />
-                                </div>
-
-                                <div class="quark-transcript" v-if="element.transcripts.length != 0">
-                                    <var-divider dashed />
-                                    <var-avatar-group>
-                                        <var-avatar v-for="trans in element.transcripts" :key="trans.id"
-                                            @click="showTrans(element.id, trans.content)" hoverable bordered
-                                            size="small" :color="_qtypeStyle[trans.type].color">
-                                            <var-icon :name="_qtypeStyle[trans.type].icon" />
-                                        </var-avatar>
-                                    </var-avatar-group>
-                                    <p class="trans-show markdown" :hidden="!_transShow[element.id]">
-                                        {{ _transShow[element.id] }}
-                                    </p>
-                                </div>
-                            </div>
-
+                        <var-paper class="quark-container" :elevation="1">
+                            <!-- Drag handler -->
                             <div class="drag-handle">
                                 <var-icon name="menu" color="grey" />
                             </div>
+                            <!-- Quark Viewer -->
+                            <quark-viewer :quark="element" />
                         </var-paper>
                     </template>
 
                     <!-- Footer Controller -->
                     <template #footer>
                         <var-menu placement="bottom" same-width :offset-y="6">
+                            <!-- Default Menu -->
                             <var-button-group type="primary">
                                 <var-button @click="addQuarkText">+ Text</var-button>
                                 <var-button style="padding: 0 6px;">
                                     <var-icon name="menu-down" :size="24" />
                                 </var-button>
                             </var-button-group>
-
+                            <!-- Expand Menu -->
                             <template #menu>
                                 <var-cell ripple @click="addQuarkImg">+ Image</var-cell>
                                 <var-cell ripple @click="addQuarkVideo">+ Video</var-cell>
@@ -79,6 +57,8 @@
                 </draggable>
             </div>
         </div>
+
+
     </div>
 </template>
 
@@ -86,26 +66,7 @@
 import { ref } from 'vue';
 import draggable from 'vuedraggable';
 
-const _qtypeStyle = {
-    text: {
-        icon: 'translate',
-        color: 'var(--color-primary)'
-    },
-    image: {
-        icon: 'image',
-        color: 'var(--color-success)'
-    },
-    "transcript/info": {
-        icon: 'information',
-        color: '#808080'
-    },
-    "transcript/explain": {
-        icon: 'message-text-outline',
-        color: '#808080'
-    }
-}
-
-const _transShow = ref({});
+import QuarkViewer from './QuarkViewer.vue';
 
 const thisAtom = ref({
     id: "A-1",
@@ -147,14 +108,11 @@ const thisAtom = ref({
 </script>
 
 <script>
-function showTrans(quark_id, content) {
-    this._transShow[quark_id] = content;
-}
-
 function onReorderQuark() {
     alert("TODO: Reorder Quark Logic");
 }
 
+/* Add Qurk */
 function addQuarkText() {
     alert("TODO: Add Quark(Text) Logic");
 }
@@ -167,8 +125,10 @@ function addQuarkVideo() {
     alert("TODO: Add Quark(Video) Logic");
 }
 
+
+/* Export Module */
 export default {
-    name: 'AtomDisplay',
+    name: 'AtomViewer',
     props: {
         title: String
     },
@@ -194,31 +154,19 @@ export default {
     padding: 0;
 }
 
-/* quark contents */
-.quark {
-    padding: 1rem;
+/* Quark */
+.quark-container {
+    padding: 1rem 0.5rem;
     margin-bottom: 0.5rem;
     display: flex;
 }
 
-.quark-body {
-    margin-left: 1rem;
-    flex: 1;
+/* draggable */
+.drag-handle {
+    float: left;
+    margin-right: 0.5rem;
 }
 
-.quark-content {
-    max-height: 5rem;
-}
-
-.quark-content p {
-    margin: 0;
-}
-
-.quark-content img {
-    max-height: 5rem;
-}
-
-/* draggable ghost */
 .ghost {
     opacity: 0;
 }
