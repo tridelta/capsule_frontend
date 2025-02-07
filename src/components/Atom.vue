@@ -17,36 +17,37 @@
         <div class="atom-contents">
             <h3>Contents</h3>
             <div class="quarks-container">
-                <var-space direction="column">
-                    <var-paper class="quark" v-for="quark in thisAtom.contents" :key="quark.id" :elevation="1">
-                        <var-space direction="row">
+                <draggable :list="thisAtom.contents" animation="200" ghost-class="ghost" itemKey="id"
+                    @start="drag = true" @end="drag = false">
+                    <template #item="{ element }">
+                        <var-paper class="quark" :elevation="1">
                             <div class="quark-icon">
-                                <var-avatar :round="false" size="small" :color="_type_style[quark.type].color">
-                                    <var-icon :name="_type_style[quark.type].icon" />
+                                <var-avatar :round="false" size="small" :color="_qtypeStyle[element.type].color">
+                                    <var-icon :name="_qtypeStyle[element.type].icon" />
                                 </var-avatar>
                             </div>
                             <div class="quark-body">
                                 <div class="quark-abstract">
-                                    <p v-if="quark.type == 'text'">{{ quark.abstract }}</p>
-                                    <img v-if="quark.type == 'image'" :src="quark.abstract" />
+                                    <p v-if="element.type == 'text'">{{ element.abstract }}</p>
+                                    <img v-if="element.type == 'image'" :src="element.abstract" />
                                 </div>
-                                <div v-if="quark.transcripts.length != 0" class="quark-transcript">
+                                <div v-if="element.transcripts.length != 0" class="quark-transcript">
                                     <var-divider dashed />
                                     <var-avatar-group>
-                                        <var-avatar v-for="trans in quark.transcripts" :key="trans.id"
-                                            @click="showTrans(quark.id, trans.content)" hoverable bordered size="small"
-                                            :color="_type_style[trans.type].color">
-                                            <var-icon :name="_type_style[trans.type].icon" />
+                                        <var-avatar v-for="trans in element.transcripts" :key="trans.id"
+                                            @click="showTrans(element.id, trans.content)" hoverable bordered
+                                            size="small" :color="_qtypeStyle[trans.type].color">
+                                            <var-icon :name="_qtypeStyle[trans.type].icon" />
                                         </var-avatar>
                                     </var-avatar-group>
-                                    <p class="trans-show" :hidden="!_trans_show[quark.id]">
-                                    <pre> {{ _trans_show[quark.id] }}</pre>
+                                    <p class="trans-show" :hidden="!_transShow[element.id]">
+                                        {{ _transShow[element.id] }}
                                     </p>
                                 </div>
                             </div>
-                        </var-space>
-                    </var-paper>
-                </var-space>
+                        </var-paper>
+                    </template>
+                </draggable>
             </div>
         </div>
     </div>
@@ -54,8 +55,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import draggable from 'vuedraggable';
 
-const _type_style = {
+const _qtypeStyle = {
     text: {
         icon: 'translate',
         color: 'var(--color-primary)'
@@ -74,7 +76,7 @@ const _type_style = {
     }
 }
 
-const _trans_show = ref({});
+const _transShow = ref({});
 
 const thisAtom = ref({
     id: "A-1",
@@ -118,7 +120,7 @@ const thisAtom = ref({
 <script>
 function showTrans(quark_id, content) {
     console.log(content)
-    this._trans_show[quark_id] = content;
+    this._transShow[quark_id] = content;
 }
 
 export default {
@@ -152,6 +154,13 @@ export default {
 /* quark contents */
 .quark {
     padding: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+}
+
+.quark-body {
+    margin-left: 1rem;
+    flex: 1;
 }
 
 .quark-abstract {
@@ -164,5 +173,10 @@ export default {
 
 .quark-abstract img {
     max-height: 5rem;
+}
+
+/* draggable ghost */
+.ghost {
+    opacity: 0;
 }
 </style>
