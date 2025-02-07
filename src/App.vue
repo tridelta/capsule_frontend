@@ -1,5 +1,7 @@
 <template>
-  <AtomDisplay title="Atom No.1"/>
+  <var-paper :elevation="2">
+    <AtomDisplay title="Atom No.1" />
+  </var-paper>
 </template>
 
 <script>
@@ -15,6 +17,5 @@ export default {
 </script>
 
 <style>
-#app {
-}
+#app {}
 </style>
