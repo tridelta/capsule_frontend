@@ -61,7 +61,19 @@
 
                     <!-- Footer Controller -->
                     <template #footer>
-                        <var-button type="primary" icon="plus" @click="addQuark">Add Quark</var-button>
+                        <var-menu placement="bottom" same-width :offset-y="6">
+                            <var-button-group type="primary">
+                                <var-button @click="addQuarkText">+ Text</var-button>
+                                <var-button style="padding: 0 6px;">
+                                    <var-icon name="menu-down" :size="24" />
+                                </var-button>
+                            </var-button-group>
+
+                            <template #menu>
+                                <var-cell ripple @click="addQuarkImg">+ Image</var-cell>
+                                <var-cell ripple @click="addQuarkVideo">+ Video</var-cell>
+                            </template>
+                        </var-menu>
                     </template>
 
                 </draggable>
@@ -139,12 +151,20 @@ function showTrans(quark_id, content) {
     this._transShow[quark_id] = content;
 }
 
-function addQuark() {
-    alert("TODO: Add Quark Logic");
-}
-
 function onReorderQuark() {
     alert("TODO: Reorder Quark Logic");
+}
+
+function addQuarkText() {
+    alert("TODO: Add Quark(Text) Logic");
+}
+
+function addQuarkImg() {
+    alert("TODO: Add Quark(Image) Logic");
+}
+
+function addQuarkVideo() {
+    alert("TODO: Add Quark(Video) Logic");
 }
 
 export default {
