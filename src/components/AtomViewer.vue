@@ -86,12 +86,10 @@ const thisAtom = ref({
             content: 'https://varletjs.org/cat.jpg',
             transcripts: [
                 {
-                    id: 'Q-5',
                     type: 'transcript/info',
                     content: '[time] 2024-10-01 12:00:00\n[location] somewhere\n[resolution] 1920x1080'
                 },
                 {
-                    id: 'Q-4',
                     type: 'transcript/explain',
                     content: 'The image shows two cat lying on the ground'
                 }
