@@ -13,7 +13,7 @@
                 <div v-if="quark.type == 'text'">
                     <VMarkdownView :content="quark.content" />
                 </div>
-                <img v-if="quark.type == 'image'" :src="quark.content" />
+                <img v-if="quark.type == 'image'" :src="'http://localhost:8000' + quark.content" />
             </div>
 
             <div class="quark-transcript" v-if="quark.transcripts.length != 0">
@@ -27,7 +27,7 @@
                     <!-- Close -->
                     <var-avatar v-if="trans_content != ''" @click="showTrans('')" hoverable size="small"
                         color="var(--color-error)">
-                        <var-icon name="window-close" color="var(--color-danger)"/>
+                        <var-icon name="window-close" color="var(--color-danger)" />
                     </var-avatar>
                 </var-avatar-group>
                 <p class="trans-show markdown" :hidden="!trans_content">
@@ -42,6 +42,10 @@
 import { ref, defineProps } from 'vue';
 
 const quarkTypeStylesheet = {
+    loading: {
+        icon: 'refresh',
+        color: '#808080'
+    },
     text: {
         icon: 'translate',
         color: 'var(--color-primary)'
@@ -61,10 +65,30 @@ const quarkTypeStylesheet = {
 }
 
 const props = defineProps({
-    quark: Object
+    quarkID: String
 });
 var trans_content = ref('');
-var typeStyle = quarkTypeStylesheet[props.quark.type];
+const quark = ref(
+    {
+        id: 'Q-1',
+        type: 'text',
+        content: 'Loading ...',
+        transcripts: []
+    }
+);
+const typeStyle = ref(quarkTypeStylesheet.loading);
+
+// fetch quark data
+function fetchQuark() {
+    var API = "http://localhost:8000/quark/" + props.quarkID;
+    fetch(API)
+        .then(response => response.json())
+        .then(data => {
+            quark.value = data.quark;
+            typeStyle.value = quarkTypeStylesheet[data.quark.type];
+        });
+}
+fetchQuark();
 </script>
 
 <script>

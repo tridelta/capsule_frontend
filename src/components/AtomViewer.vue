@@ -1,5 +1,5 @@
 <template>
-    <div class="atom">
+    <div class="atom" v-if="thisAtom">
 
 
         <div class="atom-head">
@@ -21,7 +21,7 @@
         <div class="atom-contents">
             <h3>Contents</h3>
             <div class="quarks-container">
-                <draggable :list="thisAtom.contents" animation="200" itemKey="id" ghost-class="ghost"
+                <draggable :list="thisAtom.contents" animation="200" :item-key="(x) => x" ghost-class="ghost"
                     handle=".drag-handle,.quark-icon" @end="onReorderQuark">
 
                     <!-- Quark element -->
@@ -32,7 +32,7 @@
                                 <var-icon name="menu" color="grey" />
                             </div>
                             <!-- Quark Viewer -->
-                            <quark-viewer :quark="element" />
+                            <quark-viewer :quarkID="element" />
                         </var-paper>
                     </template>
 
@@ -62,23 +62,28 @@ import QuarkEditDialog from './QuarkEditDialog.vue';
 
 import { ref, defineProps } from 'vue';
 
-// TODO: change props way to: pass down atom id and fetch the atom in this component
 const props = defineProps({
-    title: String,
-    thisAtom: Object,
-    refresh: Function
+    atomID: String,
 });
 
 const d_qe_activate = ref(false);
-const quark_list = ref([]);
 
-// init quark list
-for (var i = 0; i < props.thisAtom.contents.length; i++) {
-    quark_list.value.push(props.thisAtom.contents[i].id);
+// initial thisAtom
+function refresh_atom() {
+    var API = "http://localhost:8000/atom/" + props.atomID;
+    fetch(API)
+        .then(response => response.json())
+        .then(data => {
+            thisAtom.value = data.atom;
+        });
 }
+const thisAtom = ref({
+  "title": "Loading ..."
+});
+refresh_atom()
 
 function onReorderQuark() {
-    alert("TODO: Reorder Quark Logic");
+    update_atom();
 }
 
 /* Add Qurk */
@@ -88,31 +93,30 @@ function addQuark() {
 
 function _add_quark_complete(new_quarks) {
     for (var i = 0; i < new_quarks.length; i++) {
-        quark_list.value.push(new_quarks[i]);
+        thisAtom.value.contents.push(new_quarks[i]);
     }
     update_atom();
 }
 
 function update_atom() {
-    var API = "http://localhost:8000/atom/" + props.thisAtom.id + "/editquarks";
+    var API = "http://localhost:8000/atom/" + thisAtom.value.id + "/editquarks";
     fetch(API, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            quarks: quark_list.value
+            quarks: thisAtom.value.contents
         })
     });
-
-    props.refresh(props.thisAtom.id);
+    // thisAtom.value = refresh_atom();
 }
 
 </script>
 
 <script>
 export default {
-    name: 'AtomViewer',
+    name: 'AtomViewer'
 }
 </script>
 
