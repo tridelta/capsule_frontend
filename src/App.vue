@@ -15,7 +15,7 @@ var defaultAtom = {
         {
             id: 'Q-1',
             type: 'text',
-            content: 'This is a text quark',
+            content: 'This is a text quark\n## It supports markdown\n\n- list item 1\n- list item 2',
             transcripts: []
         },
         {

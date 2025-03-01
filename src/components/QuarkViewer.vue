@@ -11,7 +11,7 @@
         <div class="quark-body">
             <div class="quark-content">
                 <div v-if="quark.type == 'text'">
-                    <VMarkdownView :source="quark.content" />
+                    <VMarkdownView :content="quark.content" />
                 </div>
                 <img v-if="quark.type == 'image'" :src="quark.content" />
             </div>
@@ -93,7 +93,7 @@ export default {
 
 /* quark contents */
 .quark-content {
-    max-height: 5rem;
+    /* max-height: 5rem; */
 }
 
 .quark-content p {
