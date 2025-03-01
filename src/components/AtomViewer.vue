@@ -49,7 +49,8 @@
     </div>
 
     <div>
-        <QuarkEditDialog :activate="d_qe_activate" :close-dialog="()=>d_qe_activate=false"/>
+        <QuarkEditDialog :activate="d_qe_activate" :add_quark="_add_quark_complete"
+            :close-dialog="() => d_qe_activate = false" />
     </div>
 </template>
 
@@ -58,13 +59,23 @@ import draggable from 'vuedraggable';
 
 import QuarkViewer from './QuarkViewer.vue';
 import QuarkEditDialog from './QuarkEditDialog.vue';
-</script>
 
-<script>
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
+
+// TODO: change props way to: pass down atom id and fetch the atom in this component
+const props = defineProps({
+    title: String,
+    thisAtom: Object,
+    refresh: Function
+});
 
 const d_qe_activate = ref(false);
+const quark_list = ref([]);
 
+// init quark list
+for (var i = 0; i < props.thisAtom.contents.length; i++) {
+    quark_list.value.push(props.thisAtom.contents[i].id);
+}
 
 function onReorderQuark() {
     alert("TODO: Reorder Quark Logic");
@@ -75,17 +86,33 @@ function addQuark() {
     d_qe_activate.value = true;
 }
 
-/* Export Module */
+function _add_quark_complete(new_quarks) {
+    for (var i = 0; i < new_quarks.length; i++) {
+        quark_list.value.push(new_quarks[i]);
+    }
+    update_atom();
+}
+
+function update_atom() {
+    var API = "http://localhost:8000/atom/" + props.thisAtom.id + "/editquarks";
+    fetch(API, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            quarks: quark_list.value
+        })
+    });
+
+    props.refresh(props.thisAtom.id);
+}
+
+</script>
+
+<script>
 export default {
     name: 'AtomViewer',
-    props: {
-        title: String,
-        thisAtom: Object
-    },
-    methods: {
-        onReorderQuark,
-        addQuark,
-    }
 }
 </script>
 

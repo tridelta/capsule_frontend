@@ -12,12 +12,12 @@
                 <div v-if="q_type === 'text'">
                     <VMarkdownEditor v-model="content" />
                 </div>
-                <div v-if="q_type === 'image'">
-                    <var-uploader v-model="files_img" accept="images/*" @after-read="uploadFile" />
+                <div v-if="q_type === 'media'">
+                    <var-uploader v-model="files_img" :multiple="true" accept="image/*,video/*" @after-read="uploadFile" />
                 </div>
             </div>
             <div class="footer-controller">
-                <var-button type="success" class="btn-upload" @click="upload_form(closeDialog)">Save</var-button>
+                <var-button type="success" class="btn-upload" @click="upload_form(closeDialog, add_quark)">Save</var-button>
             </div>
         </var-paper>
     </div>
@@ -30,50 +30,69 @@ import { Snackbar } from '@varlet/ui';
 const q_type = ref('text');
 const q_options = ref([
     { label: 'Text', value: 'text' },
-    { label: 'Photo', value: 'image' },
+    { label: 'Media', value: 'media' },
 ])
 const content = ref('');
 const files_img = ref([]);
 
 function uploadFile(file) {
-    console.log(file);
+    // console.log(file);
 }
 
 async function createQuark(qtype, qcontent) {
-    
-    // upload
     const API = "http://localhost:8000/quark";
+    const formData = new FormData();
+    formData.append('type', qtype);
+    formData.append('content', qcontent);
+
     var resp = await fetch(API, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            type: qtype,
-            content: qcontent
-        })
-    })
-    
+        body: formData
+    });
+
     return resp.json();
 }
 
 function createSnackbar(type, text) {
-  Snackbar[type](text);
+    Snackbar[type](text);
 }
 
-async function upload_form(closeDialog) {
+async function upload_form(closeDialog, add_quark) {
+    var new_quarks = [];
     if (q_type.value === 'text') {
-        var resp = await createQuark(q_type.value, content.value);
+        let resp = await createQuark(q_type.value, content.value);
         if (resp.code != 0) {
-            createSnackbar('warning', "Upload Failed (" + resp.code + ").");
+            createSnackbar('error', "Upload Failed (" + resp.code + ").");
         }
-        else {
-            createSnackbar('success', "Upload Success.");
-            closeDialog();
+        // success
+        new_quarks.push(resp.quark_id);
+        createSnackbar('success', "Upload Success.");
+        closeDialog();
+    } else if (q_type.value === 'media') {
+        for (var i = 0; i < files_img.value.length; i++) {
+            var file = files_img.value[i];
+            // get & check file type
+            var type = file.file.type.split('/')[0];
+            if (type != 'image' && type != 'video') {
+                createSnackbar('error', "Invalid File Type.");
+                return;
+            }
+            // upload file
+            let resp = await createQuark(type, file.file);
+            if (resp.code != 0) {
+                createSnackbar('error', "Upload Failed (" + resp.code + ").");
+                return;
+            }
+            else {
+                new_quarks.push(resp.quark_id);
+                file.status = "success";
+            }
         }
-    } else if (q_type.value === 'image') {
-        // TODO
+        // success
+        createSnackbar('success', "Upload Success.");
+        closeDialog();
     }
+    add_quark(new_quarks);
 }
 </script>
 
@@ -85,6 +104,7 @@ export default {
     name: 'QuarkEditDialog',
     props: {
         activate: Boolean,
+        add_quark: Function,
         closeDialog: Function
     },
 }
