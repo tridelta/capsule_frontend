@@ -38,20 +38,7 @@
 
                     <!-- Footer Controller -->
                     <template #footer>
-                        <var-menu placement="bottom" same-width :offset-y="6">
-                            <!-- Default Menu -->
-                            <var-button-group type="primary">
-                                <var-button @click="addQuarkText">+ Text</var-button>
-                                <var-button style="padding: 0 6px;">
-                                    <var-icon name="menu-down" :size="24" />
-                                </var-button>
-                            </var-button-group>
-                            <!-- Expand Menu -->
-                            <template #menu>
-                                <var-cell ripple @click="addQuarkImg">+ Image</var-cell>
-                                <var-cell ripple @click="addQuarkVideo">+ Video</var-cell>
-                            </template>
-                        </var-menu>
+                        <var-button @click="addQuark" type="primary">+ Quark</var-button>
                     </template>
 
                 </draggable>
@@ -60,77 +47,44 @@
 
 
     </div>
+
+    <div>
+        <QuarkEditDialog :activate="d_qe_activate" :close-dialog="()=>d_qe_activate=false"/>
+    </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import draggable from 'vuedraggable';
 
 import QuarkViewer from './QuarkViewer.vue';
-
-const thisAtom = ref({
-    id: "A-1",
-    title: 'Atom No.1',
-    tags: ['tag1', 'tag2', 'tag3'],
-    last_modified: '2021-10-01',
-    contents: [
-        {
-            id: 'Q-1',
-            type: 'text',
-            content: 'This is a text quark',
-            transcripts: []
-        },
-        {
-            id: 'Q-2',
-            type: 'image',
-            content: 'https://varletjs.org/cat.jpg',
-            transcripts: [
-                {
-                    type: 'transcript/info',
-                    content: '[time] 2024-10-01 12:00:00\n[location] somewhere\n[resolution] 1920x1080'
-                },
-                {
-                    type: 'transcript/explain',
-                    content: 'The image shows two cat lying on the ground'
-                }
-            ]
-        },
-        {
-            id: 'Q-3',
-            type: 'text',
-            content: 'This is another text quark',
-            transcripts: []
-        }
-    ]
-});
+import QuarkEditDialog from './QuarkEditDialog.vue';
 </script>
 
 <script>
+import { ref } from 'vue';
+
+const d_qe_activate = ref(false);
+
+
 function onReorderQuark() {
     alert("TODO: Reorder Quark Logic");
 }
 
 /* Add Qurk */
-function addQuarkText() {
-    alert("TODO: Add Quark(Text) Logic");
+function addQuark() {
+    d_qe_activate.value = true;
 }
-
-function addQuarkImg() {
-    alert("TODO: Add Quark(Image) Logic");
-}
-
-function addQuarkVideo() {
-    alert("TODO: Add Quark(Video) Logic");
-}
-
 
 /* Export Module */
 export default {
     name: 'AtomViewer',
     props: {
-        title: String
+        title: String,
+        thisAtom: Object
     },
     methods: {
+        onReorderQuark,
+        addQuark,
     }
 }
 </script>

@@ -10,7 +10,9 @@
         <!-- Body -->
         <div class="quark-body">
             <div class="quark-content">
-                <p v-if="quark.type == 'text'" class="markdown">{{ quark.content }}</p>
+                <div v-if="quark.type == 'text'">
+                    <VMarkdownView :source="quark.content" />
+                </div>
                 <img v-if="quark.type == 'image'" :src="quark.content" />
             </div>
 
@@ -66,6 +68,9 @@ var typeStyle = quarkTypeStylesheet[props.quark.type];
 </script>
 
 <script>
+import { VMarkdownView } from 'vue3-markdown'
+import 'vue3-markdown/dist/style.css'
+
 function showTrans(content) {
     this.trans_content = content;
 }
