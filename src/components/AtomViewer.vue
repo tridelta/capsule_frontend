@@ -61,15 +61,29 @@ import QuarkViewer from './QuarkViewer.vue';
 import QuarkEditDialog from './QuarkEditDialog.vue';
 
 import { ref, defineProps } from 'vue';
+import { Snackbar } from '@varlet/ui';
 
 const props = defineProps({
     atomID: String,
+    tempAtom: Boolean,
+    atomUpd: Function
 });
 
 const d_qe_activate = ref(false);
 
 // initial thisAtom
 function refresh_atom() {
+    if (props.tempAtom) {
+        thisAtom.value = {
+            "title": "New Atom",
+            "tags": [],
+            "id": "A-new",
+            "last_modified": "Just Now",
+            "contents": []
+        };
+        return;
+    }
+
     var API = "http://localhost:8000/atom/" + props.atomID;
     fetch(API)
         .then(response => response.json())
@@ -78,7 +92,7 @@ function refresh_atom() {
         });
 }
 const thisAtom = ref({
-  "title": "Loading ..."
+    "title": "Loading ..."
 });
 refresh_atom()
 
@@ -108,8 +122,17 @@ function update_atom() {
         body: JSON.stringify({
             quarks: thisAtom.value.contents
         })
-    });
-    // thisAtom.value = refresh_atom();
+    }).then(response => response.json())
+        .then(data => {
+            if (data.code == 0) {
+                Snackbar.success("Update Success.");
+                // thisAtom.value = refresh_atom();
+                props.atomUpd(data.atom_id);
+            } else {
+                Snackbar.error("Update Failed (atom.editquark." + data.code + ").");
+                console.log("Error: " + data.message);
+            }
+        });
 }
 
 </script>

@@ -62,7 +62,7 @@ async function upload_form(closeDialog, add_quark) {
     if (q_type.value === 'text') {
         let resp = await createQuark(q_type.value, content.value);
         if (resp.code != 0) {
-            createSnackbar('error', "Upload Failed (" + resp.code + ").");
+            createSnackbar('error', "Upload Failed (createQuark." + resp.code + ").");
         }
         // success
         new_quarks.push(resp.quark_id);
@@ -80,7 +80,7 @@ async function upload_form(closeDialog, add_quark) {
             // upload file
             let resp = await createQuark(type, file.file);
             if (resp.code != 0) {
-                createSnackbar('error', "Upload Failed (" + resp.code + ").");
+                createSnackbar('error', "Upload Failed (createQuark." + resp.code + ").");
                 return;
             }
             else {
