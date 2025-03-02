@@ -15,8 +15,18 @@
 <script setup>
 import { ref } from 'vue';
 
-// localStorage.setItem('atomList', JSON.stringify(['A-1']));
-const atomList = ref(JSON.parse(localStorage.getItem('atomList')));
+const atomList = ref(['?-loading']);
+
+function fetchAtoms() {
+  // fetch atoms from server
+  var API = "http://localhost:8000/atom_list";
+  fetch(API)
+    .then(response => response.json())
+    .then(data => {
+      atomList.value = data.atom_list;
+    });
+}
+fetchAtoms();
 
 function addAtom() {
   // generate new id
@@ -32,10 +42,6 @@ function onAtomUpdate(aid) {
       // replace the temporary id with the real one
       var _idx = atomList.value.indexOf(aid);
       atomList.value[_idx] = atom_id;
-
-      // save to local storage
-      console.log('Saving to localStorage');
-      localStorage.setItem('atomList', JSON.stringify(atomList.value));
     }
   }
 

@@ -13,8 +13,8 @@
             <br>
 
             <!-- Infos -->
-            <li class="atom-info">ID: {{ thisAtom.id }}</li>
-            <li class="atom-info">Last Modified: {{ thisAtom.last_modified }}</li>
+            <li class="atom-info">ID: {{ thisAtom.id }} <var-icon :name="copy_aid_icon" @click="_copy_aid(thisAtom.id)" /></li>
+            <li class="atom-info">Last Modified: {{ _time_cvt(thisAtom.last_modify) }}</li>
         </div>
 
 
@@ -71,6 +71,41 @@ const props = defineProps({
 
 const d_qe_activate = ref(false);
 
+
+// helper
+function _time_cvt(time) {
+    var _t = new Date(time);
+    var _now = new Date();
+    var _diff = _now - _t;
+    if (_diff < 1000 * 3600) {
+        return Math.floor(_diff / (1000 * 60)) + " minutes ago";
+    }
+    else if (_diff < 1000 * 3600 * 24) {
+        // less than 1 week
+        return Math.floor(_diff / (1000 * 3600)) + " hours ago";
+    }
+    else if (_diff < 1000 * 3600 * 24 * 7) {
+        // less than 1 week
+        var day_name = ['星期天', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        return day_name[_t.getDay()];
+    }
+    else {
+        return _t.toLocaleString();
+    }
+}
+
+// copy AtomID
+const copy_aid_icon = ref("content-copy");
+function _copy_aid(text) {
+    copy_aid_icon.value = "check";
+    navigator.clipboard.writeText(text);
+
+    setTimeout(() => {
+        copy_aid_icon.value = "content-copy";
+    }, 1000);
+}
+
+
 // initial thisAtom
 function refresh_atom() {
     if (props.tempAtom) {
@@ -78,7 +113,7 @@ function refresh_atom() {
             "title": "New Atom",
             "tags": [],
             "id": "A-new",
-            "last_modified": "Just Now",
+            "last_modify": "Just Now",
             "contents": []
         };
         return;
@@ -125,16 +160,15 @@ function update_atom() {
     }).then(response => response.json())
         .then(data => {
             if (data.code == 0) {
-                Snackbar.success("Update Success.");
+                // Snackbar.success("Synced.");
                 // thisAtom.value = refresh_atom();
-                props.atomUpd(data.atom_id);
+                if (props.atomUpd) props.atomUpd(data.atom_id);
             } else {
                 Snackbar.error("Update Failed (atom.editquark." + data.code + ").");
                 console.log("Error: " + data.message);
             }
         });
 }
-
 </script>
 
 <script>
@@ -158,6 +192,11 @@ export default {
     color: grey;
     font-size: 0.8rem;
     padding: 0;
+}
+
+.atom-info>i {
+    cursor: pointer;
+    font-size: 0.9rem;
 }
 
 /* Quark */

@@ -1,7 +1,7 @@
 <template>
     <div class="mask" v-if="activate">
         <var-paper class="content">
-            <var-button type="danger" round icon-container class="close-button" @click="closeDialog()">
+            <var-button type="danger" round icon-container class="close-button" @click="try_to_close(closeDialog)">
                 <var-icon name="window-close" />
             </var-button>
             <h2 class="noselect">New Quark</h2>
@@ -25,7 +25,7 @@
 
 <script setup>
 import { ref } from 'vue';
-import { Snackbar } from '@varlet/ui';
+import { Dialog, Snackbar } from '@varlet/ui';
 
 const q_type = ref('text');
 const q_options = ref([
@@ -34,6 +34,26 @@ const q_options = ref([
 ])
 const content = ref('');
 const files_img = ref([]);
+
+function try_to_close(closeDialog) {
+    function _confirm_close() {
+        content.value = '';
+        files_img.value = [];
+        closeDialog();
+    }
+
+    if (content.value.length == 0 && files_img.value.length == 0) {
+        _confirm_close();
+        return;
+    }
+    Dialog({
+        title: '退出编辑',
+        message: '您有更改尚未保存，推出编辑将丢失更改。确定要退出吗？',
+        confirmButtonText: '退出',
+        cancelButtonText: '继续编辑',
+        onConfirm: _confirm_close
+    })
+}
 
 function uploadFile(file) {
     // console.log(file);
