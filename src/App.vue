@@ -14,12 +14,13 @@
 
 <script setup>
 import { ref } from 'vue';
+import API_PREFIX from './apiConfig';
 
 const atomList = ref(['?-loading']);
 
 function fetchAtoms() {
   // fetch atoms from server
-  var API = "http://localhost:8000/atom_list";
+  const API = `${API_PREFIX}/atom_list`;
   fetch(API)
     .then(response => response.json())
     .then(data => {

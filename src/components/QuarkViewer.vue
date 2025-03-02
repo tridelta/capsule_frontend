@@ -13,7 +13,7 @@
                 <div v-if="quark.type == 'text'">
                     <VMarkdownView :content="quark.content" />
                 </div>
-                <img v-if="quark.type == 'image'" :src="'http://localhost:8000' + quark.content" />
+                <img v-if="quark.type == 'image'" :src="`${API_PREFIX}${quark.content}`" />
             </div>
 
             <div class="quark-transcript" v-if="quark.transcripts.length != 0">
@@ -40,6 +40,7 @@
 
 <script setup>
 import { ref, defineProps } from 'vue';
+import API_PREFIX from '../apiConfig';
 
 const quarkTypeStylesheet = {
     loading: {
@@ -80,7 +81,7 @@ const typeStyle = ref(quarkTypeStylesheet.loading);
 
 // fetch quark data
 function fetchQuark() {
-    var API = "http://localhost:8000/quark/" + props.quarkID;
+    const API = `${API_PREFIX}/quark/${props.quarkID}`;
     fetch(API)
         .then(response => response.json())
         .then(data => {

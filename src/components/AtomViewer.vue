@@ -63,6 +63,8 @@ import QuarkEditDialog from './QuarkEditDialog.vue';
 import { ref, defineProps } from 'vue';
 import { Snackbar } from '@varlet/ui';
 
+import API_PREFIX from '../apiConfig';
+
 const props = defineProps({
     atomID: String,
     tempAtom: Boolean,
@@ -119,7 +121,7 @@ function refresh_atom() {
         return;
     }
 
-    var API = "http://localhost:8000/atom/" + props.atomID;
+    var API = `${API_PREFIX}/atom/${props.atomID}`;
     fetch(API)
         .then(response => response.json())
         .then(data => {
@@ -148,7 +150,7 @@ function _add_quark_complete(new_quarks) {
 }
 
 function update_atom() {
-    var API = "http://localhost:8000/atom/" + thisAtom.value.id + "/editquarks";
+    var API = `${API_PREFIX}/atom/${thisAtom.value.id}/editquarks`;
     fetch(API, {
         method: 'POST',
         headers: {

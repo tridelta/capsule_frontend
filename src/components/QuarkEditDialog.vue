@@ -26,6 +26,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Dialog, Snackbar } from '@varlet/ui';
+import API_PREFIX from '../apiConfig';
 
 const q_type = ref('text');
 const q_options = ref([
@@ -60,7 +61,7 @@ function uploadFile(file) {
 }
 
 async function createQuark(qtype, qcontent) {
-    const API = "http://localhost:8000/quark";
+    const API = `${API_PREFIX}/quark`;
     const formData = new FormData();
     formData.append('type', qtype);
     formData.append('content', qcontent);
