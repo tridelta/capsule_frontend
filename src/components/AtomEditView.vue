@@ -4,16 +4,33 @@
 
         <div class="atom-head">
             <!-- Title -->
-            <h1>{{ thisAtom.title }}</h1>
+            <h1 v-if="!edit_title_mode">
+                {{ thisAtom.title }}
+                <var-icon name="grey mdi mdi-pencil" @click="_edit_title" />
+            </h1>
+            <div v-if="edit_title_mode" class="edittitle">
+                <var-input :placeholder="thisAtom.title" v-model="newTitle" :autofocus="true"
+                    @keydown.enter="_edit_title_confirm" @keydown.escape="_edit_title_cancle" />
+                <var-icon @click="_edit_title_confirm" name="checkbox-marked-circle" color="var(--color-success)" />
+                <var-icon @click="_edit_title_cancle" name="close-circle" color="var(--color-danger)" />
+            </div>
 
             <!-- Tags -->
             <var-space>
-                <var-badge v-for="tag in thisAtom.tags" :key="tag" :value="tag" type="primary" />
+                <var-badge v-for="tag in thisAtom.tags" :key="tag" :value="tag + ' ×'" type="primary" @click="_rm_tag(tag)"/>
+                <var-badge v-if="!add_tag_mode" value="+" type="info" class="add-tag" @click="_add_tag" />
+                <div v-if="add_tag_mode" class="add-tag-inputs">
+                    <var-input v-if="add_tag_mode" size="small" placeholder="New Tag" :autofocus="true" v-model="newTag"
+                        @keydown.enter="_add_tag_confirm" @keydown.escape="_add_tag_cancel" />
+                    <var-icon @click="_add_tag_confirm" name="checkbox-marked-circle" color="var(--color-success)" />
+                    <var-icon @click="_add_tag_cancel" name="close-circle" color="var(--color-danger)" />
+                </div>
             </var-space>
             <br>
 
             <!-- Infos -->
-            <li class="atom-info">ID: {{ thisAtom.id }} <var-icon :name="copy_aid_icon" @click="_copy_aid(thisAtom.id)" /></li>
+            <li class="atom-info">ID: {{ thisAtom.id }} <var-icon :name="copy_aid_icon"
+                    @click="_copy_aid(thisAtom.id)" /></li>
             <li class="atom-info">Last Modified: {{ _time_cvt(thisAtom.last_modify) }}</li>
         </div>
 
@@ -32,7 +49,10 @@
                                 <var-icon name="menu" color="grey" />
                             </div>
                             <!-- Quark Viewer -->
-                            <quark-viewer :quarkID="element" />
+                            <quark-viewer :quarkID="element" :display-avatar="true" :display-trans="true"/>
+                            <div class="rm-handle">
+                                <var-icon name="delete" color="var(--color-danger)" @click="rm_quark(element)"/>
+                            </div>
                         </var-paper>
                     </template>
 
@@ -107,6 +127,49 @@ function _copy_aid(text) {
     }, 1000);
 }
 
+// edit title
+const edit_title_mode = ref(false);
+const newTitle = ref("");
+function _edit_title() {
+    edit_title_mode.value = true;
+}
+function _edit_title_confirm() {
+    thisAtom.value.title = newTitle.value;
+    update_atom();
+    _edit_title_cancle();
+}
+function _edit_title_cancle() {
+    newTitle.value = "";
+    edit_title_mode.value = false;
+}
+
+// add tag
+const add_tag_mode = ref(false);
+const newTag = ref("");
+function _add_tag() {
+    add_tag_mode.value = true;
+}
+function _add_tag_confirm() {
+    thisAtom.value.tags.push(newTag.value);
+    update_atom();
+    _add_tag_cancel();
+}
+function _add_tag_cancel() {
+    newTag.value = "";
+    add_tag_mode.value = false;
+}
+function _rm_tag(tag) {
+    var idx = thisAtom.value.tags.indexOf(tag);
+    thisAtom.value.tags.splice(idx, 1);
+    update_atom();
+}
+
+// remove quark
+function rm_quark(qid) {
+    var idx = thisAtom.value.contents.indexOf(qid);
+    thisAtom.value.contents.splice(idx, 1);
+    update_atom();
+}
 
 // initial thisAtom
 function refresh_atom() {
@@ -150,13 +213,15 @@ function _add_quark_complete(new_quarks) {
 }
 
 function update_atom() {
-    var API = `${API_PREFIX}/atom/${thisAtom.value.id}/editquarks`;
+    var API = `${API_PREFIX}/atom/${thisAtom.value.id}/edit`;
     fetch(API, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            title: thisAtom.value.title,
+            tags: thisAtom.value.tags,
             quarks: thisAtom.value.contents
         })
     }).then(response => response.json())
@@ -175,7 +240,7 @@ function update_atom() {
 
 <script>
 export default {
-    name: 'AtomViewer'
+    name: 'AtomEditView'
 }
 </script>
 
@@ -201,11 +266,41 @@ export default {
     font-size: 0.9rem;
 }
 
+.var-icon-grey {
+    color: grey;
+}
+
+h1>i {
+    line-height: 2em;
+}
+
+.edittitle {
+    display: flex;
+    align-items: flex-end;
+}
+
+.edittitle>.var-input {
+    flex: 1;
+}
+
+.add-tag {
+    user-select: none;
+}
+
+.add-tag-inputs {
+    display: flex;
+    align-items: flex-end;
+}
+
 /* Quark */
 .quark-container {
     padding: 1rem 0.5rem;
     margin-bottom: 0.5rem;
     display: flex;
+}
+
+.quark {
+    flex: 1;
 }
 
 /* draggable */

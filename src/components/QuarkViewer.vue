@@ -1,7 +1,7 @@
 <template>
     <div class="quark">
         <!-- Icon -->
-        <div class="quark-icon">
+        <div class="quark-icon" v-if="props.displayAvatar">
             <var-avatar :round="false" size="small" :color="typeStyle.color">
                 <var-icon :name="typeStyle.icon" />
             </var-avatar>
@@ -13,10 +13,10 @@
                 <div v-if="quark.type == 'text'">
                     <VMarkdownView :content="quark.content" />
                 </div>
-                <img v-if="quark.type == 'image'" :src="`${API_PREFIX}${quark.content}`" />
+                <img @click="showBigImg = true" v-if="quark.type == 'image'" :src="`${API_PREFIX}${quark.content}`" />
             </div>
 
-            <div class="quark-transcript" v-if="quark.transcripts.length != 0">
+            <div class="quark-transcript" v-if="(props.displayTrans) && (quark.transcripts.length != 0)">
                 <var-divider dashed />
                 <var-avatar-group>
                     <var-avatar v-for="trans in quark.transcripts" :key="trans.id" @click="showTrans(trans.content)"
@@ -35,6 +35,13 @@
                 </p>
             </div>
         </div>
+
+        <!-- Popups -->
+        <var-popup v-model:show="showBigImg">
+            <div class="popup-bigimg">
+                <img class="bigimg" :src="`${API_PREFIX}${quark.content}`" />
+            </div>
+        </var-popup>
     </div>
 </template>
 
@@ -66,9 +73,12 @@ const quarkTypeStylesheet = {
 }
 
 const props = defineProps({
-    quarkID: String
+    quarkID: String,
+    displayTrans: Boolean,
+    displayAvatar: Boolean
 });
 var trans_content = ref('');
+const showBigImg = ref(false);
 const quark = ref(
     {
         id: 'Q-1',
@@ -111,10 +121,11 @@ export default {
     display: flex;
 }
 
-.quark-body {
-    margin-left: 1rem;
-    flex: 1;
+.quark-icon {
+    margin-right: 1rem;
 }
+
+.quark-body {}
 
 /* quark contents */
 .quark-content {
@@ -127,5 +138,15 @@ export default {
 
 .quark-content img {
     max-height: 5rem;
+}
+
+.popup-bigimg {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.bigimg {
+    max-width: 100%;
+    max-height: 100%;
 }
 </style>

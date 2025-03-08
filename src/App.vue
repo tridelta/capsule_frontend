@@ -2,7 +2,7 @@
   <div class="atom-container">
     <var-space direction="column" wrap="wrap">
       <var-paper :elevation="2" v-for="aid in atomList" :key="aid">
-        <AtomViewer :atomID="aid" :tempAtom="aid[0]=='?'" :atomUpd="onAtomUpdate(aid)" />
+        <AtomCardView :atomID="aid" :tempAtom="aid[0]=='?'" :atomUpd="onAtomUpdate(aid)" />
       </var-paper>
     </var-space>
 
@@ -52,13 +52,13 @@ function onAtomUpdate(aid) {
 
 <script>
 // main app
-import AtomViewer from './components/AtomViewer.vue';
+// eslint-disable-next-line no-unused-vars
+import AtomEditView from './components/AtomEditView.vue';
+// eslint-disable-next-line no-unused-vars
+import AtomCardView from './components/AtomCardView.vue';
 
 export default {
-  name: 'App',
-  components: {
-    AtomViewer
-  }
+  name: 'App'
 }
 </script>
 
