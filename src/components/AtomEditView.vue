@@ -17,8 +17,10 @@
 
             <!-- Tags -->
             <var-space>
-                <var-badge v-for="tag in thisAtom.tags" :key="tag" :value="tag + ' ×'" type="primary" @click="_rm_tag(tag)"/>
-                <var-badge v-if="!add_tag_mode" value="+" type="info" class="add-tag" @click="_add_tag" />
+                <div class="atom-tag" v-for="tag in thisAtom.tags" :key="tag" @click="_rm_tag(tag)">
+                    <var-badge :value="tag + ' ×'" type="primary" />
+                </div>
+                <var-badge v-if="!add_tag_mode" value="+" type="info" @click="_add_tag" />
                 <div v-if="add_tag_mode" class="add-tag-inputs">
                     <var-input v-if="add_tag_mode" size="small" placeholder="New Tag" :autofocus="true" v-model="newTag"
                         @keydown.enter="_add_tag_confirm" @keydown.escape="_add_tag_cancel" />
@@ -49,9 +51,9 @@
                                 <var-icon name="menu" color="grey" />
                             </div>
                             <!-- Quark Viewer -->
-                            <quark-viewer :quarkID="element" :display-avatar="true" :display-trans="true"/>
+                            <quark-viewer :quarkID="element" :display-avatar="true" :display-trans="true" />
                             <div class="rm-handle">
-                                <var-icon name="delete" color="var(--color-danger)" @click="rm_quark(element)"/>
+                                <var-icon name="delete" color="var(--color-danger)" @click="rm_quark(element)" />
                             </div>
                         </var-paper>
                     </template>
@@ -281,6 +283,10 @@ h1>i {
 
 .edittitle>.var-input {
     flex: 1;
+}
+
+.atom-tag {
+    cursor: pointer;
 }
 
 .add-tag {

@@ -2,7 +2,7 @@
   <div class="atom-container">
     <var-space direction="column" wrap="wrap">
       <var-paper :elevation="2" v-for="aid in atomList" :key="aid">
-        <AtomCardView :atomID="aid" :tempAtom="aid[0]=='?'" :atomUpd="onAtomUpdate(aid)" />
+        <AtomEditView :atomID="aid" :tempAtom="aid[0]=='?'" :atomUpd="onAtomUpdate(aid)" />
       </var-paper>
     </var-space>
 
